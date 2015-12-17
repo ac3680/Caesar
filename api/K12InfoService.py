@@ -100,7 +100,7 @@ def update_student(uid):
         return "Updating a student's uid is forbidden\n", 409
     new_student = update_item(uid, student)
     if new_student:
-        return dumps(new_student), 203
+        return "Student(" + uid + ") updated successfully", 203
     else:
         return not_found()
 
@@ -110,7 +110,7 @@ def delete_student(uid):
     student = find_item(uid)
     if student:
         delete_item(uid)
-        return "Student(" + uid + ")deleted successfully", 204
+        return "Student(" + uid + ") deleted successfully", 204
     else:
         return not_found()
 
