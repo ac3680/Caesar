@@ -60,7 +60,7 @@ def delete_item(uid):
 #==============================================================================
 
 # POST .../students - Create a new student
-@app.route('/students', methods = ['POST'])
+@app.route('/K12', methods = ['POST'])
 def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
@@ -74,7 +74,7 @@ def post_student():
     return message, 201
 
 # GET .../students/<uid> - Get a student by uid
-@app.route('/students/<uid>', methods = ['GET'])
+@app.route('/K12/<uid>', methods = ['GET'])
 def get_student(uid):
     student = find_item(uid)
     if student:
@@ -83,7 +83,7 @@ def get_student(uid):
         return not_found()
 
 # GET .../students - Get all students
-@app.route('/students', methods = ['GET'])
+@app.route('/K12', methods = ['GET'])
 def get_all_students():
     students = find_all_items()
     if students:
@@ -92,7 +92,7 @@ def get_all_students():
         return not_found()
 
 # PUT .../students/<uid> - Update student field
-@app.route('/students/<uid>', methods=['PUT'])
+@app.route('/K12/<uid>', methods=['PUT'])
 def update_student(uid):
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
@@ -105,7 +105,7 @@ def update_student(uid):
         return not_found()
 
 # DELETE .../students/<uid> - Delete a student
-@app.route('/students/<uid>', methods=['DELETE'])
+@app.route('/K12/<uid>', methods=['DELETE'])
 def delete_student(uid):
     student = find_item(uid)
     if student:
