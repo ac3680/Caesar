@@ -21,3 +21,12 @@ Set a default region in ~/.aws/config:
 region=us-east-1
 ```
 
+### Sample Curl Requests
+```
+# Change schema
+curl http://localhost:9002/K12
+curl -X PUT --data "professor=Don" http://localhost:9002/K12/schema/table
+curl http://localhost:9002/K12
+curl -X DELETE http://localhost:9002/K12/schema/table/professor
+curl http://localhost:9002/K12
+```
