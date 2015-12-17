@@ -135,7 +135,6 @@ def update_schema():
             if key is 'uid':
                 return "Modifying a student's uid is forbidden\n", 409
             student[key] = value
-    print students
     batch_update(students)
     return "Schema successfully updated"
 
@@ -151,7 +150,6 @@ def delete_schema(key):
             del student[key]
         except KeyError:
             pass
-    print students
     batch_update(students)
     return "Schema key(" + key + ") successfully deleted", 204
 
