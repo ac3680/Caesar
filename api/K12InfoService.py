@@ -140,15 +140,18 @@ def delete_student(uid):
 # PUT .../K12/schema/table - Add a column to the table schema with default values
 @app.route('/K12/schema/table', methods = ['PUT'])
 def update_schema():
-    data = form_or_json()
-    students = find_all_items()
-    for student in students:
-        uid = student['uid']
-        for (key, value) in data.iteritems():
-            if key is 'uid':
-                return "Modifying a student's uid is forbidden\n", 409
-            student[key] = value
-    batch_update(students)
+    try:
+        data = form_or_json()
+        students = find_all_items()
+        for student in students:
+            uid = student['uid']
+            for (key, value) in data.iteritems():
+                if key is 'uid':
+                    return "Modifying a student's uid field is forbidden\n", 409
+                student[key] = value
+        batch_update(students)
+    except:
+        return "You must initiate the value of the field to something - it cannot be blank\n", 400
     return "Schema successfully updated"
 
 # DELETE .../K12/schema/table/<key> - Delete a column from the table schema
