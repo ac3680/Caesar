@@ -162,6 +162,8 @@ def delete_student(uid):
         uid = regex.sub('', uid)
     except:
         return "Bad request, improper UID format", 400
+    if len(uid) < 1:
+	return "Bad request, improper UID format", 400
     student = find_item(uid)
     if student:
         delete_item(uid)
@@ -200,21 +202,29 @@ def update_schema():
 # DELETE .../K12/schema/table/<key> - Delete a column from the table schema
 @app.route('/K12/schema/table/<key>', methods = ['DELETE'])
 def delete_schema(key):
+    print "Delete :" + key
     try:
         regex = re.compile('[^0-9a-zA-Z]')
         key = regex.sub('', key)
+	print "Regexed: " + key
     except:
         return "Bad request, improper key format", 400
-    print key
-    if key is 'uid':
+    if len(key) < 1:
+	return "Bad request, improper key format", 400
+    if key == 'uid':
+	print "RETURN 403"
         return "Deleting a student's uid is forbidden\n", 403
     students = find_all_items()
     for student in students:
+	print "I am here"
         uid = student['uid']
+	print "Student: " + str(student)
         try:
             del student[key]
         except KeyError:
+	    print "DIE!"
             pass
+    print "PASSED"
     batch_update(students)
     return "Schema key(" + key + ") successfully deleted", 200
 
