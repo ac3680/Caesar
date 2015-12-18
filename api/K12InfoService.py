@@ -2,14 +2,21 @@ import requests
 from bson.json_util import dumps
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
+from boto3.session import Session
 from flask import Flask, url_for
 from flask import request
 from flask import json
 from flask import Response
 from flask import jsonify
 
+# Read AWS account keys from file
+keys = [line.rstrip('\n') for line in open('keys.txt')]
+session = Session(aws_access_key_id=keys[0],
+                  aws_secret_access_key=keys[1],
+                  region_name='us-east-1')
+
 # Set up Dynamo
-dynamodb = boto3.resource('dynamodb')
+dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('students')
 
 # Set up Flask

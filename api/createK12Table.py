@@ -1,7 +1,14 @@
 import boto3
+from boto3.session import Session
 
-# Get the service resource.
-dynamodb = boto3.resource('dynamodb')
+# Read AWS account keys from file
+keys = [line.rstrip('\n') for line in open('keys.txt')]
+session = Session(aws_access_key_id=keys[0],
+                  aws_secret_access_key=keys[1],
+                  region_name='us-east-1')
+
+# Set up Dynamo
+dynamodb = session.resource('dynamodb')
 
 # Create the DynamoDB table.
 # A second index can be included of KeyType 'RANGE'

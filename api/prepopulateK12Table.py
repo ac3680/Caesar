@@ -1,7 +1,17 @@
 import boto3
+from boto3.session import Session
+
+# Read AWS account keys from file
+keys = [line.rstrip('\n') for line in open('keys.txt')]
+session = Session(aws_access_key_id=keys[0],
+                  aws_secret_access_key=keys[1],
+                  region_name='us-east-1')
+
+# Set up Dynamo
+dynamodb = session.resource('dynamodb')
 
 # Get the service resource.
-dynamodb = boto3.resource('dynamodb')
+# dynamodb = boto3.resource('dynamodb')
 
 table = dynamodb.Table('students')
 
