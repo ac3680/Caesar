@@ -156,8 +156,42 @@ Expected response:
 Note: not all improper inputs will give this response, some will return 'Bad request, improper UID'
 
 Testing Schema Change PUT
+1. Add a new column
+curl -X PUT --data "professor=Don" http://localhost:9002/K12/schema/table
+Expected response: Schema successfully updated
 
-Testing Schema Change Delete
+2. Add an existing column 
+curl -X PUT --data "school=Hogwarts" http://localhost:9002/K12/schema/table
+Expected response: Schema successfully updated
+[{"uid": "nb2406", "professor": "Don", "last_name": "B", "school": "Hogwarts", "first_name": "Nina"}, {"uid": "mlh2197", "professor": "Don", "last_name": "H", "school": "Hogwarts", "first_name": "Melanie"}, {"professor": "Don", "school": "Hogwarts", "uid": "drop", "name": "Nina Baculin"}, {"professor": "Don", "school": "Hogwarts", "uid": "bla--ncks"}, {"professor": "Don", "school": "Hogwarts", "uid": "blank", "name": "Nina Bac"}, {"professor": "Don", "school": "Hogwarts", "uid": "drop table", "name": "Nina Baculin"}, {"uid": "wvb2103", "professor": "Don", "last_name": "B", "school": "Hogwarts", "first_name": "Whitney"}, {"professor": "Don", "school": "Hogwarts", "uid": "drop table Students;", "name": "Nina Baculin"}, {"professor": "Don", "school": "Hogwarts", "uid": "bla", "name": "Nina0Baculinao"}, {"professor": "Don", "school": "Hogwarts", "uid": "K12InfoService.py#@K12InfoService.py", "name": "Nina Baculinao"}, {"professor": "Don", "school": "Hogwarts", "uid": "drop table --", "name": "Nina Baculin"}, {"professor": "Don", "school": "Hogwarts", "profession": "Professor", "uid": "profwu", "name": "EugeneWu"}, {"professor": "Don", "school": "Hogwarts", "uid": "blanks2", "name": "Nina0@Baculinao"}, {"professor": "Don", "school": "Hogwarts", "uid": "mmm", "name": "Nina Baculin"}, {"professor": "Don", "school": "Hogwarts", "uid": "blanks3", "name": "Nina0@Baculinao"}]Melanies-MBP:api bluemelodia$ 
+Everyone goes to Hogwarts now
+
+3. Try to add the uid column
+curl -X PUT --data "uid=evil" http://localhost:9002/K12/schema/table
+Expected response: Modifying a student's uid field is forbidden
+
+4. Try to add a column with bad data 
+curl -X PUT --data "professor=" http://localhost:9002/K12/schema/table
+Expected response: You must initiate the value of the field to something - it cannot be blank
+
+5. Update on a new schema field
+GET http://localhost:9002/K12Eugene Wu" localhost:9002/K12/nb2406
+Expected response: Student(nb2406) updated successfully
+{"uid": "nb2406", "professor": "EugeneWu", "last_name": "B", "school": "Hogwarts", "first_name": "Nina"}
+
+Testing Schema Change DELETE
+1. Try to delete uid 
+curl -X DELETE http://localhost:9002/K12/schema/table/uid
+Expected response: Deleting a student's uid is forbidden
+
+2. Try to delete something we never added 
+curl -X DELETE http://localhost:9002/K12/schema/table/turtle
+Expected response: Schema key(turtle) successfully deleted
+
+3. Try to delete a valid field
+curl -X DELETE http://localhost:9002/K12/schema/table/professor
+Expected response: Schema key(professor) successfully deleted
+Nobody has a professor now
 
 Other
 
