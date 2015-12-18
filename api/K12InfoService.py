@@ -94,6 +94,11 @@ def post_student():
 # GET .../students/<uid> - Get a student by uid
 @app.route('/K12/<uid>', methods = ['GET'])
 def get_student(uid):
+    try:
+        regex = re.compile('[^0-9a-zA-Z]')
+        uid = regex.sub('', uid)
+    except:
+	return "Bad request, improper UID format", 400
     student = find_item(uid)
     if student:
         return dumps(student), 200
@@ -157,7 +162,13 @@ def update_schema():
             for (key, value) in data.iteritems():
                 if key is 'uid':
                     return "Modifying a student's uid field is forbidden\n", 403
-                student[key] = value
+                try: 
+		    regex = re.compile('[^0-9a-zA-Z]')
+		    value = regex.sub('', value)
+		except: 
+		    message = "Bad request, improper " + str(key) + " format"
+		    return message, 400
+		student[key] = value
         batch_update(students)
     except:
         return "You must initiate the value of the field to something - it cannot be blank\n", 400
@@ -170,7 +181,7 @@ def delete_schema(key):
         regex = re.compile('[^0-9a-zA-Z]')
         key = regex.sub('', key)
     except:
-        return "Bad request, improper UID format", 400
+        return "Bad request, improper key format", 400
     print key
     if key is 'uid':
         return "Deleting a student's uid is forbidden\n", 403
