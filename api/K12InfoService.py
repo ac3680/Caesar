@@ -1,7 +1,7 @@
 import requests
-from bson.json_util import dumps
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
+from bson.json_util import dumps
 from flask import Flask, url_for
 from flask import request
 from flask import json
