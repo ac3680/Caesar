@@ -43,3 +43,21 @@ curl http://localhost:9002/K12
 curl -X DELETE http://localhost:9002/K12/schema/table/professor
 curl http://localhost:9002/K12
 ```
+### Test Cases
+1. Nonsense uid
+curl -X POST --data "uid=$@&name=Nina Baculinao" http://localhost:9002/K12
+Expected response: Bad request, improper UID
+Note: MS cannot survive certain bad inputs, such as additional &s in the data fields
+
+2. Blank uid
+curl -X POST --data "uid=&name=Nina Baculinao" http://localhost:9002/K12
+Expected response: Bad request, improper UID
+
+3. Nonsense student name
+curl -X POST --data "uid=blanks&name=Nina$#@Baculinao" http://localhost:9002/K12
+
+4. Existing student
+curl -X POST --data "uid=blanks&name=Nina Baculinao Evil Twin/localhost:9002/K12
+Expected response: The student(blanks) already exists
+
+5. 
