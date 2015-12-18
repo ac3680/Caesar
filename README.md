@@ -25,7 +25,7 @@ Run `python createK12Table.py` to create your DynamoDB table.
 
 Optionally run `python prepopulateK12Table.py` to populate your DynamoDB table with our group members.
 
-Now you should be able to run `python K12Table.py`.
+Now you should be able to run `python K12InfoService.py`.
 
 ### Sample Curl Requests
 ```
