@@ -78,7 +78,7 @@ def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' not in student:
-        return "Need uid to create new student\n", 409
+        return "Need uid to create new student\n", 400
     regex = re.compile('[^0-9a-zA-Z]')
     student_uid = regex.sub('', student['uid'])
     uid = student_uid
@@ -112,12 +112,12 @@ def update_student(uid):
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' in student:
-        return "Updating a student's uid is forbidden\n", 409
+        return "Updating a student's uid is forbidden\n", 403
     regex = re.compile('[^0-9a-zA-Z]')
     uid = regex.sub('', uid)
     new_student = update_item(uid, student)
     if new_student:
-        return "Student(" + uid + ") updated successfully", 203
+        return "Student(" + uid + ") updated successfully", 200
     else:
         return not_found()
 
@@ -129,7 +129,7 @@ def delete_student(uid):
     student = find_item(uid)
     if student:
         delete_item(uid)
-        return "Student(" + uid + ") deleted successfully", 204
+        return "Student(" + uid + ") deleted successfully", 200
     else:
         return not_found()
 
@@ -147,7 +147,7 @@ def update_schema():
             uid = student['uid']
             for (key, value) in data.iteritems():
                 if key is 'uid':
-                    return "Modifying a student's uid field is forbidden\n", 409
+                    return "Modifying a student's uid field is forbidden\n", 403
                 student[key] = value
         batch_update(students)
     except:
@@ -161,7 +161,7 @@ def delete_schema(key):
     key = regex.sub('', key)
     print key
     if key is 'uid':
-        return "Deleting a student's uid is forbidden\n", 409
+        return "Deleting a student's uid is forbidden\n", 403
     students = find_all_items()
     for student in students:
         uid = student['uid']
@@ -170,7 +170,7 @@ def delete_schema(key):
         except KeyError:
             pass
     batch_update(students)
-    return "Schema key(" + key + ") successfully deleted", 204
+    return "Schema key(" + key + ") successfully deleted", 200
 
 #==============================================================================
 # Error Handling
