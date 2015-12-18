@@ -1,7 +1,7 @@
 import requests
-from bson.json_util import dumps
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
+from bson.json_util import dumps
 from boto3.session import Session
 from flask import Flask, url_for
 from flask import request
@@ -61,6 +61,12 @@ def delete_item(uid):
     table.delete_item(
     Key={ 'uid': uid }
     )
+
+# Update - as a batch
+def batch_update(students):
+    with table.batch_writer() as batch:
+        for student in students:
+            batch.put_item(Item=student)
 
 #==============================================================================
 # REST Operations
@@ -122,6 +128,39 @@ def delete_student(uid):
         return not_found()
 
 #==============================================================================
+# Schema Changes
+#==============================================================================
+
+# PUT .../K12/schema/table - Add a column to the table schema with default values
+@app.route('/K12/schema/table', methods = ['PUT'])
+def update_schema():
+    data = form_or_json()
+    students = find_all_items()
+    for student in students:
+        uid = student['uid']
+        for (key, value) in data.iteritems():
+            if key is 'uid':
+                return "Modifying a student's uid is forbidden\n", 409
+            student[key] = value
+    batch_update(students)
+    return "Schema successfully updated"
+
+# DELETE .../K12/schema/table/<key> - Delete a column from the table schema
+@app.route('/K12/schema/table/<key>', methods = ['DELETE'])
+def delete_schema(key):
+    if key is 'uid':
+        return "Deleting a student's uid is forbidden\n", 409
+    students = find_all_items()
+    for student in students:
+        uid = student['uid']
+        try:
+            del student[key]
+        except KeyError:
+            pass
+    batch_update(students)
+    return "Schema key(" + key + ") successfully deleted", 204
+
+#==============================================================================
 # Error Handling
 #==============================================================================
 
@@ -144,7 +183,6 @@ def not_found(error=None):
 def form_or_json():
     data = request.data
     return json.loads(data) if data is not '' else request.form
-
 
 if __name__ == '__main__':
     app.run(
