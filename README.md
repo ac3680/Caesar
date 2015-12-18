@@ -103,6 +103,29 @@ curl -X GET http://localhost:9002/K12/blanks
 Expected response: {"name": "Nina Baculinao", "uid": "blanks"}
 
 Testing PUT
+1. Changing existing column 
+curl -X PUT --data "school=SCE" http://localhost:9002/K12/blanks
+Expected response: Student(blanks) updated successfully
+curl -X GET http://localhost:9002/K12/blanks
+{"school": "SCE", "name": "Nina Baculinao", "uid": "blanks"}
+
+2. Changing non-existing column
+curl -X PUT --data "iq=240" localhost:9002/K12/blanks
+Expected response: Student(blanks) updated successfully
+curl -X GET http://localhost:9002/K12/blanks
+{"iq": "240", "school": "SCE", "name": "Nina Baculinao", "uid": "blanks"}
+
+3. Changing column with blank value (intentionally)
+curl -X PUT --data "iq=" localhost:9002/K12/blanks
+Expected response: Bad request, improper iq
+
+4. Changing column with blank value (through stripping of invalid characters)
+curl -X PUT --data "iq=$" localhost:9002/K12/blanks
+Expected response: Bad request, improper iq
+
+5. Trying to change the uid
+curl -X PUT --data "uid=$" localhost:9002/K12/blanks
+Expected response: Updating a student's uid is forbidden
 
 Testing DELETE
 
