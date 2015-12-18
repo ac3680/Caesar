@@ -79,8 +79,11 @@ def post_student():
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' not in student:
         return "Need uid to create new student\n", 400
-    regex = re.compile('[^0-9a-zA-Z]')
-    student_uid = regex.sub('', student['uid'])
+    try:
+        regex = re.compile('[^0-9a-zA-Z]')
+        student_uid = regex.sub('', student['uid'])
+    except:
+        return "Bad request, improper UID format", 400
     uid = student_uid
     if find_item(uid):
         return "The student(" + uid + ") already exists", 409
@@ -113,8 +116,11 @@ def update_student(uid):
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' in student:
         return "Updating a student's uid is forbidden\n", 403
-    regex = re.compile('[^0-9a-zA-Z]')
-    uid = regex.sub('', uid)
+    try:
+        regex = re.compile('[^0-9a-zA-Z]')
+        uid = regex.sub('', uid)
+    except:
+        return "Bad request, improper UID format", 400
     new_student = update_item(uid, student)
     if new_student:
         return "Student(" + uid + ") updated successfully", 200
@@ -124,8 +130,11 @@ def update_student(uid):
 # DELETE .../students/<uid> - Delete a student
 @app.route('/K12/<uid>', methods=['DELETE'])
 def delete_student(uid):
-    regex = re.compile('[^0-9a-zA-Z]')
-    uid = regex.sub('', uid)
+    try:
+        regex = re.compile('[^0-9a-zA-Z]')
+        uid = regex.sub('', uid)
+    except:
+        return "Bad request, improper UID format", 400
     student = find_item(uid)
     if student:
         delete_item(uid)
@@ -157,8 +166,11 @@ def update_schema():
 # DELETE .../K12/schema/table/<key> - Delete a column from the table schema
 @app.route('/K12/schema/table/<key>', methods = ['DELETE'])
 def delete_schema(key):
-    regex = re.compile('[^0-9a-zA-Z]')
-    key = regex.sub('', key)
+    try:
+        regex = re.compile('[^0-9a-zA-Z]')
+        key = regex.sub('', key)
+    except:
+        return "Bad request, improper UID format", 400
     print key
     if key is 'uid':
         return "Deleting a student's uid is forbidden\n", 403
