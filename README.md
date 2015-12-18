@@ -46,6 +46,7 @@ curl http://localhost:9002/K12
 
 ```
 ### Test Cases
+Testing POST
 1. Nonsense uid
 curl -X POST --data "uid=$@&name=Nina Baculinao" http://localhost:9002/K12
 Expected response: Bad request, improper UID
@@ -77,4 +78,39 @@ Expected response: Need uid to create new student
 8. Extra column
 curl -X POST --data "uid=profwu&name=Eugene Wu&profession=Professor" http://localhost:9002/K12
 Expected response: New student(profwu) created
+
+Testing GET
+1. curl -X GET http://localhost:9002/K12
+Expected response: list of all the students
+Can't really break this one
+
+2. Nonexistent uid
+curl -X GET http://localhost:9002/K12/peach
+Expected response: {
+  "message": "Not Found: http://localhost:9002/K12/peach", 
+  "status": 404
+}
+
+3. Bad uid
+curl -X GET http://localhost:9002/K12/$$$$$
+Expected response: {
+  "message": "Not Found: http://localhost:9002/K12/3597035970$", 
+  "status": 404
+}
+
+4. Valid uid 
+curl -X GET http://localhost:9002/K12/blanks
+Expected response: {"name": "Nina Baculinao", "uid": "blanks"}
+
+Testing PUT
+
+Testing DELETE
+
+Testing Schema Change PUT
+
+Testing Schema Change Delete
+
+Other
+
+
 ```
