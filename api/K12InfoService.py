@@ -78,18 +78,28 @@ def batch_update(students):
 def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
-    print "Student: " + str(student)
+    #print "Student: " + str(student)
     if 'uid' not in student:
         return "Need uid to create new student\n", 400
-    print "UID: " + str(student['uid'])
-    try:
-	print "Hoi"
-        regex = re.compile('[^0-9a-zA-Z]')
-        print "Hi"
-	uid = regex.sub('', str(student['uid']))
-    except:
-	message = "Bad request, improper uid format"
-        return message, 400
+    #print "UID: " + str(student['uid'])
+    for key, value in student.iteritems():
+	#print key + " " + value
+   	try:
+            regex = re.compile('[^0-9a-zA-Z]')
+	    if (key == 'uid'):
+		#print "uid: " + key
+     		uid = regex.sub('', str(student['uid']))
+	    else:
+		#print key
+	        student[key] = regex.sub('', str(student[key]))
+		if len(student[key]) < 1:
+	    	    message = "Bad request, improper " + key + " format"
+	    	    return message, 400
+        except:
+	    message = "Bad request, improper " + key + " format"
+            return message, 400
+    if len(uid) < 1:
+        return "Bad request, improper uid format", 400
     if find_item(uid):
         return "The student(" + uid + ") already exists", 409
     create_item(student)
@@ -103,6 +113,8 @@ def get_student(uid):
         regex = re.compile('[^0-9a-zA-Z]')
         uid = regex.sub('', uid)
     except:
+	return "Bad request, improper UID format", 400
+    if len(uid) < 1:
 	return "Bad request, improper UID format", 400
     student = find_item(uid)
     if student:
@@ -126,11 +138,16 @@ def update_student(uid):
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' in student:
         return "Updating a student's uid is forbidden\n", 403
-    try:
-        regex = re.compile('[^0-9a-zA-Z]')
-        uid = regex.sub('', uid)
-    except:
-        return "Bad request, improper UID format", 400
+    for key, value in student.iteritems():
+   	try:
+            regex = re.compile('[^0-9a-zA-Z]')
+	    student[key] = regex.sub('', str(student[key]))
+	    if len(student[key]) < 1:
+	    	message = "Bad request, improper " + key + " format"
+		return message, 400
+        except:
+	    message = "Bad request, improper " + key + " format"
+            return message, 400
     new_student = update_item(uid, student)
     if new_student:
         return "Student(" + uid + ") updated successfully", 200
@@ -173,6 +190,7 @@ def update_schema():
 		except: 
 		    message = "Bad request, improper " + str(key) + " format"
 		    return message, 400
+		# We allow the length of the new value to be 0
 		student[key] = value
         batch_update(students)
     except:
