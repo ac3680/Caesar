@@ -79,7 +79,9 @@ def post_student():
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' not in student:
         return "Need uid to create new student\n", 409
-    uid = student['uid']
+    regex = re.compile('[^0-9a-zA-Z]')
+    student_uid = regex.sub('', student['uid'])
+    uid = student_uid
     if find_item(uid):
         return "The student(" + uid + ") already exists", 409
     create_item(student)
@@ -111,6 +113,8 @@ def update_student(uid):
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' in student:
         return "Updating a student's uid is forbidden\n", 409
+    regex = re.compile('[^0-9a-zA-Z]')
+    uid = regex.sub('', uid)
     new_student = update_item(uid, student)
     if new_student:
         return "Student(" + uid + ") updated successfully", 203
@@ -120,6 +124,8 @@ def update_student(uid):
 # DELETE .../students/<uid> - Delete a student
 @app.route('/K12/<uid>', methods=['DELETE'])
 def delete_student(uid):
+    regex = re.compile('[^0-9a-zA-Z]')
+    uid = regex.sub('', uid)
     student = find_item(uid)
     if student:
         delete_item(uid)
@@ -148,8 +154,9 @@ def update_schema():
 # DELETE .../K12/schema/table/<key> - Delete a column from the table schema
 @app.route('/K12/schema/table/<key>', methods = ['DELETE'])
 def delete_schema(key):
-    regex = re.compile('[^a-zA-Z]')
+    regex = re.compile('[^0-9a-zA-Z]')
     key = regex.sub('', key)
+    print key
     if key is 'uid':
         return "Deleting a student's uid is forbidden\n", 409
     students = find_all_items()
