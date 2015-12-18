@@ -43,6 +43,8 @@ curl http://localhost:9002/K12
 curl -X DELETE http://localhost:9002/K12/schema/table/professor
 curl http://localhost:9002/K12
 ```
+
+```
 ### Test Cases
 1. Nonsense uid
 curl -X POST --data "uid=$@&name=Nina Baculinao" http://localhost:9002/K12
@@ -60,4 +62,19 @@ curl -X POST --data "uid=blanks&name=Nina$#@Baculinao" http://localhost:9002/K12
 curl -X POST --data "uid=blanks&name=Nina Baculinao Evil Twin/localhost:9002/K12
 Expected response: The student(blanks) already exists
 
-5. 
+5. Empty name
+curl -X POST --data "uid=bla--ncks&name=$" http://localhost:9002/K12
+Expected response: Bad request, improper name
+
+6. No name
+api bluemelodia$ curl -X POST --data "uid=bla--ncks" http://localhost:9002/K12
+Expected response: New student(blancks) created
+
+7. No uid
+curl -X POST --data "" http://localhost:9002/K12
+Expected response: Need uid to create new student
+
+8. Extra column
+curl -X POST --data "uid=profwu&name=Eugene Wu&profession=Professor" http://localhost:9002/K12
+Expected response: New student(profwu) created
+```
