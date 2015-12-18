@@ -128,6 +128,32 @@ curl -X PUT --data "uid=$" localhost:9002/K12/blanks
 Expected response: Updating a student's uid is forbidden
 
 Testing DELETE
+1. Existing uid
+curl -X DELETE http://localhost:9002/K12/blanks 
+Expected response: Student(blanks) deleted successfully
+curl -X GET http://localhost:9002/K12/blanks
+{
+  "message": "Not Found: http://localhost:9002/K12/blanks", 
+  "status": 404
+}
+
+2. Non-existing uid
+curl -X DELETE http://localhost:9002/K12/blankss
+Expected response: 
+{
+  "message": "Not Found: http://localhost:9002/K12/blankss", 
+  "status": 404
+}
+
+3. Improper uid
+curl -X DELETE http://localhost:9002/K12/#$#@!
+Expected response: 
+{
+  "message": "Not Found: http://localhost:9002/K12/blankss", 
+  "status": 404
+}
+
+Note: not all improper inputs will give this response, some will return 'Bad request, improper UID'
 
 Testing Schema Change PUT
 
