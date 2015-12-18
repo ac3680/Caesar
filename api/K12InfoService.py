@@ -1,5 +1,6 @@
 import requests
 import boto3
+import re
 from boto3.dynamodb.conditions import Key, Attr
 from bson.json_util import dumps
 from boto3.session import Session
@@ -77,14 +78,18 @@ def batch_update(students):
 def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
+    print "Student: " + str(student)
     if 'uid' not in student:
         return "Need uid to create new student\n", 400
+    print "UID: " + str(student['uid'])
     try:
+	print "Hoi"
         regex = re.compile('[^0-9a-zA-Z]')
-        student_uid = regex.sub('', student['uid'])
+        print "Hi"
+	uid = regex.sub('', str(student['uid']))
     except:
-        return "Bad request, improper UID format", 400
-    uid = student_uid
+	message = "Bad request, improper uid format"
+        return message, 400
     if find_item(uid):
         return "The student(" + uid + ") already exists", 409
     create_item(student)
