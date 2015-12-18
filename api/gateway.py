@@ -27,10 +27,10 @@ class RegexConverter(BaseConverter):
 app.url_map.converters['regex'] = RegexConverter
    
 # Read AWS account keys from file
-keys = [line.rstrip('\n') for line in open('keys.txt')]
+keys = [line.rstrip('\n\r') for line in open('keys.txt')]
 
 # Find the list of queue names and routes that we are dealing with
-queues = [line.rstrip('\n') for line in open('config.txt')]
+queues = [line.rstrip('\n\r') for line in open('config.txt')]
 qList = []
 for each in queues:
     qList.append(each.split(','))

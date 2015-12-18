@@ -3,7 +3,7 @@ import time
 import boto.sqs
 from boto.sqs.message import RawMessage
 while True:
-    keys = [line.rstrip('\n') for line in open('keys.txt')]
+    keys = [line.rstrip('\n\r') for line in open('keys.txt')]
 
     conf = {
       "sqs-access-key": keys[0],

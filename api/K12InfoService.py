@@ -10,7 +10,7 @@ from flask import Response
 from flask import jsonify
 
 # Read AWS account keys from file
-keys = [line.rstrip('\n') for line in open('keys.txt')]
+keys = [line.rstrip('\n\r') for line in open('keys.txt')]
 session = Session(aws_access_key_id=keys[0],
                   aws_secret_access_key=keys[1],
                   region_name='us-east-1')
