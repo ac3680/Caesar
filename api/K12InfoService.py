@@ -148,6 +148,8 @@ def update_schema():
 # DELETE .../K12/schema/table/<key> - Delete a column from the table schema
 @app.route('/K12/schema/table/<key>', methods = ['DELETE'])
 def delete_schema(key):
+    regex = re.compile('[^a-zA-Z]')
+    key = regex.sub('', key)
     if key is 'uid':
         return "Deleting a student's uid is forbidden\n", 409
     students = find_all_items()
