@@ -1,3 +1,12 @@
+'''
+@app.route('/K12', methods = ['POST'])
+@app.route('/K12/<uid>', methods = ['GET'])
+@app.route('/K12', methods = ['GET'])
+@app.route('/K12/<uid>', methods=['PUT'])
+@app.route('/K12/<uid>', methods=['DELETE'])
+@app.route('/K12/schema/table', methods = ['PUT'])
+@app.route('/K12/schema/table/<key>', methods = ['DELETE'])
+'''
 import json
 import time
 import boto.sqs
