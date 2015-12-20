@@ -1,3 +1,6 @@
+#To use as main, run python SecurityService.py "http request message"
+#in command line.
+
 import sys
 
 primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29] 
