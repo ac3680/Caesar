@@ -86,7 +86,7 @@ def post_student():
     if 'uid' not in student:
         return unprocessable_entity("need uid to create new student")
     for key, value in student.iteritems():
-        student[key] = defense(value)
+        student[key] = sanitize(value)
         if (student[key] == ''):
             return bad_request("improper UID format")
     uid = student['uid']
@@ -101,7 +101,7 @@ def get_student(uid):
     if not valid_signature():
         return unauthorized()
 
-    uid = defense(uid)
+    uid = sanitize(uid)
     if (uid == ''):
         return bad_request("improper UID format")
 	student = find_item(uid)
@@ -134,7 +134,7 @@ def update_student(uid):
     if 'uid' in student:
         return unprocessable_entity("modifying the uid field is forbidden")
     for key, value in student.iteritems():
-        student[key] = defense(value)
+        student[key] = sanitize(value)
         if (student[key] == ''):
             return bad_request("improper UID format")
     new_student = update_item(uid, student)
@@ -149,7 +149,7 @@ def delete_student(uid):
     if not valid_signature():
         return unauthorized()
 
-    uid = defense(uid)
+    uid = sanitize(uid)
     if (uid == ''):
         return bad_request("improper UID format")
     student = find_item(uid)
@@ -173,7 +173,7 @@ def update_schema():
             for (key, value) in data.iteritems():
                 if key == 'uid':
                     return unprocessable_entity("modifying the uid field is forbidden")
-                student[key] = defense(value)
+                student[key] = sanitize(value)
                 if (student[key] == ''):
                     return bad_request("improper UID format")
         batch_update(students)
@@ -184,7 +184,7 @@ def update_schema():
 # DELETE .../K12/schema/table/<key> - Delete a column from the table schema
 @app.route('/K12/schema/table/<key>', methods = ['DELETE'])
 def delete_schema(key):
-    key = defense(key)
+    key = sanitize(key)
     if key == '':
         return bad_request("improper UID format")
     if key == 'uid':
@@ -253,8 +253,8 @@ def form_or_json():
     data = request.data
     return json.loads(data) if data is not '' else request.form
 
-# Injection defense
-def defense(value):
+# Code injection defense
+def sanitize(value):
     try:
         regex = re.compile('[^0-9a-zA-Z]')
         value = regex.sub('', str(value))
