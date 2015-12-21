@@ -81,13 +81,14 @@ def post_student():
     if 'uid' not in student:
         return unprocessable_entity("need uid to create new student")
     for key, value in student.iteritems():
-        value = defense(value)
-        if value == '':
+        student[key] = defense(value)
+        if (student[key] == ''):
             return bad_request("improper UID format")
+    uid = student['uid']
     if find_item(uid):
         return unprocessable_entity("the entity already exists")
     create_item(student)
-    return "OK: new student(" + uid+ ") created", 201
+    return "OK: new student(" + uid + ") created\n", 201
 
 # GET .../students/<uid> - Get a student by uid
 @app.route('/K12/<uid>', methods = ['GET'])
@@ -118,12 +119,12 @@ def update_student(uid):
     if 'uid' in student:
         return unprocessable_entity("modifying the uid field is forbidden")
     for key, value in student.iteritems():
-        value = defense(value)
-        if value == '':
+        student[key] = defense(value)
+        if (student[key] == ''):
             return bad_request("improper UID format")
     new_student = update_item(uid, student)
     if new_student:
-        return "OK: student(" + uid + ") updated successfully", 200
+        return "OK: student(" + uid + ") updated successfully\n", 200
     else:
         return not_found()
 
@@ -136,7 +137,7 @@ def delete_student(uid):
     student = find_item(uid)
     if student:
         delete_item(uid)
-        return "No Content: student(" + uid + ") deleted successfully", 204
+        return "No Content: student(" + uid + ") deleted successfully\n", 204
     else:
         return not_found()
 
@@ -151,18 +152,16 @@ def update_schema():
         data = form_or_json()
         students = find_all_items()
         for student in students:
-            uid = student['uid']
             for (key, value) in data.iteritems():
                 if key == 'uid':
                     return unprocessable_entity("modifying the uid field is forbidden")
-                value = defense(value)
-                if (value == ''):
+                student[key] = defense(value)
+                if (student[key] == ''):
                     return bad_request("improper UID format")
-                student[key] = value
         batch_update(students)
     except:
         return bad_request("you must initiate the value of the field to something - it cannot be blank")
-    return "OK: schema successfully updated", 200
+    return "OK: schema successfully updated\n", 200
 
 # DELETE .../K12/schema/table/<key> - Delete a column from the table schema
 @app.route('/K12/schema/table/<key>', methods = ['DELETE'])
@@ -180,7 +179,7 @@ def delete_schema(key):
         except KeyError:
             pass
     batch_update(students)
-    return "No Content: schema key(" + key + ") successfully deleted", 204
+    return "No Content: schema key(" + key + ") successfully deleted\n", 204
 
 #==============================================================================
 # Error Handling
