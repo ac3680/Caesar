@@ -79,21 +79,9 @@ def batch_update(students):
 def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
-    
-    signature = request.headers.get('signature')
-    if not signature:
-        return "Unauthorized transaction\n", 401
-	
-    req = "POST /K12"
-    message = req
 
-    for (key, value) in student.iteritems():
-        message = message + " " + str(value)
-
-    hash_value = encrypt(message)
-    
-    if hash_value != int(signature):
-        return "Unauthorized transaction\n", 401
+    if not valid_signature(student):
+        return unauthorized()
 
     if 'uid' not in student:
         return unprocessable_entity("need uid to create new student")
@@ -110,17 +98,8 @@ def post_student():
 # GET .../students/<uid> - Get a student by uid
 @app.route('/K12/<uid>', methods = ['GET'])
 def get_student(uid):
-    signature = request.headers.get('signature')
-    if not signature:
-        return "Unauthorized transaction\n", 401
-	
-    req = "GET /K12/" + str(uid)
-    message = req
-
-    hash_value = encrypt(message)
-    
-    if hash_value != int(signature):
-        return "Unauthorized transaction\n", 401
+    if not valid_signature():
+        return unauthorized()
 
     uid = defense(uid)
     if (uid == ''):
@@ -134,17 +113,8 @@ def get_student(uid):
 # GET .../students - Get all students
 @app.route('/K12', methods = ['GET'])
 def get_all_students():
-    signature = request.headers.get('signature')
-    if not signature:
-        return "Unauthorized transaction\n", 401
-	
-    req = "GET /K12"
-    message = req
-
-    hash_value = encrypt(message)
-    
-    if hash_value != int(signature):
-        return "Unauthorized transaction\n", 401
+    if not valid_signature():
+        return unauthorized()
 
     students = find_all_items()
     if students:
@@ -157,21 +127,9 @@ def get_all_students():
 def update_student(uid):
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
-    
-    signature = request.headers.get('signature')
-    if not signature:
-        return "Unauthorized transaction\n", 401
-	
-    req = "PUT /K12/" + str(uid)
-    message = req
 
-    for (key, value) in student.iteritems():
-        message = message + " " + str(value)
-    
-	hash_value = encrypt(message)
-    
-    if hash_value != int(signature):
-        return "Unauthorized transaction\n", 401
+    if not valid_signature(student):
+        return unauthorized()
 
     if 'uid' in student:
         return unprocessable_entity("modifying the uid field is forbidden")
@@ -188,17 +146,8 @@ def update_student(uid):
 # DELETE .../students/<uid> - Delete a student
 @app.route('/K12/<uid>', methods=['DELETE'])
 def delete_student(uid):
-    signature = request.headers.get('signature')
-    if not signature:
-        return "Unauthorized transaction\n", 401
-	
-    req = "DELETE /K12/" + str(uid)
-    message = req
-
-    hash_value = encrypt(message)
-    
-    if hash_value != int(signature):
-        return "Unauthorized transaction\n", 401
+    if not valid_signature():
+        return unauthorized()
 
     uid = defense(uid)
     if (uid == ''):
@@ -275,6 +224,16 @@ def bad_request(detail, error=None):
     response.status_code = 400
     return response
 
+@app.errorhandler(401)
+def unauthorized(error=None):
+    message = {
+            'status': 401,
+            'message': 'Unauthorized Transaction'
+    }
+    response = jsonify(message)
+    response.status_code = 401
+    return response
+
 @app.errorhandler(422)
 def unprocessable_entity(detail, error=None):
     message = {
@@ -305,6 +264,21 @@ def defense(value):
     if len(value) < 1:
         return ' '
     return value
+
+# Check signature
+def valid_signature(student=None):
+    signature = request.headers.get('signature')
+    if not signature:
+        return False
+    # Get the type of request and URI ex. GET /K12/nb2406
+    message = request.method + ' ' + request.script_root + request.path
+    if student:
+        for (key, value) in student.iteritems():
+            message = message + " " + str(value)
+    hash_value = encrypt(message)
+    if hash_value != int(signature):
+        return False
+    return True
 
 if __name__ == '__main__':
     app.run(
