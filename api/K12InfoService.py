@@ -101,7 +101,7 @@ def post_student():
     if len(uid) < 1:
         return "Bad request, improper uid format", 400
     if find_item(uid):
-        return "The student(" + uid + ") already exists", 409
+        return "The student(" + uid + ") already exists", 422
     create_item(student)
     message = "New student(" + uid+ ") created\n"
     return message, 201
@@ -137,7 +137,7 @@ def update_student(uid):
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' in student:
-        return "Updating a student's uid is forbidden\n", 403
+        return "Updating a student's uid is forbidden\n", 422
     for key, value in student.iteritems():
    	try:
             regex = re.compile('[^0-9a-zA-Z]')
@@ -185,8 +185,8 @@ def update_schema():
             uid = student['uid']
             for (key, value) in data.iteritems():
                 if key == 'uid':
-                    return "Modifying a student's uid field is forbidden\n", 403
                 try: 
+                    return "Modifying a student's uid field is forbidden\n", 422
 		    regex = re.compile('[^0-9a-zA-Z]')
 		    value = regex.sub('', value)
 		except: 
@@ -211,7 +211,7 @@ def delete_schema(key):
     if len(key) < 1:
 	return "Bad request, improper key format", 400
     if key == 'uid':
-        return "Deleting a student's uid is forbidden\n", 403
+        return "Deleting a student's uid is forbidden\n", 422
     students = find_all_items()
     for student in students:
         uid = student['uid']
