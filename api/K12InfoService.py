@@ -78,30 +78,14 @@ def batch_update(students):
 def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
-    #print "Student: " + str(student)
     if 'uid' not in student:
-        return "Need uid to create new student\n", 400
-    #print "UID: " + str(student['uid'])
+        return unprocessable_entity("need uid to create new student")
     for key, value in student.iteritems():
-	#print key + " " + value
-   	try:
-            regex = re.compile('[^0-9a-zA-Z]')
-	    if (key == 'uid'):
-		#print "uid: " + key
-     		uid = regex.sub('', str(student['uid']))
-	    else:
-		#print key
-	        student[key] = regex.sub('', str(student[key]))
-		if len(student[key]) < 1:
-	    	    message = "Bad request, improper " + key + " format"
-	    	    return message, 400
-        except:
-	    message = "Bad request, improper " + key + " format"
-            return message, 400
-    if len(uid) < 1:
-        return "Bad request, improper uid format", 400
+        value = convert(value)
+        if value == '':
+            return bad_request("improper UID format")
     if find_item(uid):
-        return "The student(" + uid + ") already exists", 422
+        return unprocessable_entity("the entity already exists")
     create_item(student)
     message = "New student(" + uid+ ") created\n"
     return message, 201
@@ -109,13 +93,9 @@ def post_student():
 # GET .../students/<uid> - Get a student by uid
 @app.route('/K12/<uid>', methods = ['GET'])
 def get_student(uid):
-    try:
-        regex = re.compile('[^0-9a-zA-Z]')
-        uid = regex.sub('', uid)
-    except:
-	return "Bad request, improper UID format", 400
-    if len(uid) < 1:
-	return "Bad request, improper UID format", 400
+    uid = convert(uid)
+    if (uid == ''):
+        return bad_request("improper UID format")
     student = find_item(uid)
     if student:
         return dumps(student), 200
@@ -137,17 +117,11 @@ def update_student(uid):
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
     if 'uid' in student:
-        return "Updating a student's uid is forbidden\n", 422
+        return unprocessable_entity("modifying the uid field is forbidden")
     for key, value in student.iteritems():
-   	try:
-            regex = re.compile('[^0-9a-zA-Z]')
-	    student[key] = regex.sub('', str(student[key]))
-	    if len(student[key]) < 1:
-	    	message = "Bad request, improper " + key + " format"
-		return message, 400
-        except:
-	    message = "Bad request, improper " + key + " format"
-            return message, 400
+        value = convert(value)
+        if value == '':
+            return bad_request("improper UID format")
     new_student = update_item(uid, student)
     if new_student:
         return "Student(" + uid + ") updated successfully", 200
@@ -157,17 +131,13 @@ def update_student(uid):
 # DELETE .../students/<uid> - Delete a student
 @app.route('/K12/<uid>', methods=['DELETE'])
 def delete_student(uid):
-    try:
-        regex = re.compile('[^0-9a-zA-Z]')
-        uid = regex.sub('', uid)
-    except:
-        return "Bad request, improper UID format", 400
-    if len(uid) < 1:
-	return "Bad request, improper UID format", 400
+    uid = convert(uid)
+    if (uid == ''):
+        return bad_request("improper UID format")
     student = find_item(uid)
     if student:
         delete_item(uid)
-        return "Student(" + uid + ") deleted successfully", 200
+        return "Student(" + uid + ") deleted successfully", 204
     else:
         return not_found()
 
@@ -185,33 +155,24 @@ def update_schema():
             uid = student['uid']
             for (key, value) in data.iteritems():
                 if key == 'uid':
-                try: 
-                    return "Modifying a student's uid field is forbidden\n", 422
-		    regex = re.compile('[^0-9a-zA-Z]')
-		    value = regex.sub('', value)
-		except: 
-		    message = "Bad request, improper " + str(key) + " format"
-		    return message, 400
-		# We allow the length of the new value to be 0
-		student[key] = value
+                    return unprocessable_entity("modifying the uid field is forbidden")
+                value = convert(value)
+                if (value == ''):
+                    return bad_request("improper UID format")
+                student[key] = value
         batch_update(students)
     except:
-        return "You must initiate the value of the field to something - it cannot be blank\n", 400
+        return bad_request("you must initiate the value of the field to something - it cannot be blank")
     return "Schema successfully updated"
 
 # DELETE .../K12/schema/table/<key> - Delete a column from the table schema
 @app.route('/K12/schema/table/<key>', methods = ['DELETE'])
 def delete_schema(key):
-    try:
-        regex = re.compile('[^0-9a-zA-Z]')
-        key = regex.sub('', key)
-	print "Regexed: " + key
-    except:
-        return "Bad request, improper key format", 400
-    if len(key) < 1:
-	return "Bad request, improper key format", 400
+    key = convert(key)
+    if key == '':
+        return bad_request("improper UID format")
     if key == 'uid':
-        return "Deleting a student's uid is forbidden\n", 422
+        return unprocessable_entity("deleting the uid field is forbidden")
     students = find_all_items()
     for student in students:
         uid = student['uid']
@@ -220,7 +181,7 @@ def delete_schema(key):
         except KeyError:
             pass
     batch_update(students)
-    return "Schema key(" + key + ") successfully deleted", 200
+    return "Schema key(" + key + ") successfully deleted", 204
 
 #==============================================================================
 # Error Handling
@@ -237,6 +198,26 @@ def not_found(error=None):
     response.status_code = 404
     return response
 
+@app.errorhandler(400)
+def bad_request(detail, error=None):
+    message = {
+            'status': 400,
+            'message': 'Bad Request: ' + detail
+    }
+    response = jsonify(message)
+    response.status_code = 400
+    return response
+
+@app.errorhandler(422)
+def unprocessable_entity(detail, error=None):
+    message = {
+            'status': 422,
+            'message': 'Unprocessable Entity: ' + detail
+    }
+    response = jsonify(message)
+    response.status_code = 422
+    return response
+
 #==============================================================================
 # Helper Methods
 #==============================================================================
@@ -245,6 +226,18 @@ def not_found(error=None):
 def form_or_json():
     data = request.data
     return json.loads(data) if data is not '' else request.form
+
+# Injection defense
+def convert(value):
+    try:
+        regex = re.compile('[^0-9a-zA-Z]')
+        value = regex.sub('', str(value))
+    except:
+	    return ''
+    # Convert empty values to a space
+    if len(value) < 1:
+        return ' '
+    return value
 
 if __name__ == '__main__':
     app.run(
