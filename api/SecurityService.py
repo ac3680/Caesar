@@ -8,6 +8,8 @@ primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 def hash(message):
 	message = str(message)
 	length = len(message)
+	
+	message = message.lower()
 
 	count = 0
 	index = 0

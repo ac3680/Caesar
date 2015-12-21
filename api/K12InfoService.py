@@ -9,6 +9,7 @@ from flask import request
 from flask import json
 from flask import Response
 from flask import jsonify
+from SecurityService import encrypt
 
 # Read AWS account keys from file
 keys = [line.rstrip('\n\r') for line in open('keys.txt')]
@@ -78,6 +79,22 @@ def batch_update(students):
 def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
+    
+    signature = request.headers.get('signature')
+    if not signature:
+        return "Unauthorized transaction\n", 401
+	
+    req = "POST /K12"
+    message = req
+
+    for (key, value) in student.iteritems():
+        message = message + " " + str(value)
+
+    hash_value = encrypt(message)
+    
+    if hash_value != int(signature):
+        return "Unauthorized transaction\n", 401
+
     if 'uid' not in student:
         return unprocessable_entity("need uid to create new student")
     for key, value in student.iteritems():
@@ -93,10 +110,22 @@ def post_student():
 # GET .../students/<uid> - Get a student by uid
 @app.route('/K12/<uid>', methods = ['GET'])
 def get_student(uid):
+    signature = request.headers.get('signature')
+    if not signature:
+        return "Unauthorized transaction\n", 401
+	
+    req = "GET /K12/" + str(uid)
+    message = req
+
+    hash_value = encrypt(message)
+    
+    if hash_value != int(signature):
+        return "Unauthorized transaction\n", 401
+
     uid = defense(uid)
     if (uid == ''):
         return bad_request("improper UID format")
-    student = find_item(uid)
+	student = find_item(uid)
     if student:
         return dumps(student), 200
     else:
@@ -105,6 +134,18 @@ def get_student(uid):
 # GET .../students - Get all students
 @app.route('/K12', methods = ['GET'])
 def get_all_students():
+    signature = request.headers.get('signature')
+    if not signature:
+        return "Unauthorized transaction\n", 401
+	
+    req = "GET /K12"
+    message = req
+
+    hash_value = encrypt(message)
+    
+    if hash_value != int(signature):
+        return "Unauthorized transaction\n", 401
+
     students = find_all_items()
     if students:
         return dumps(students), 200
@@ -116,6 +157,22 @@ def get_all_students():
 def update_student(uid):
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
+    
+    signature = request.headers.get('signature')
+    if not signature:
+        return "Unauthorized transaction\n", 401
+	
+    req = "PUT /K12/" + str(uid)
+    message = req
+
+    for (key, value) in student.iteritems():
+        message = message + " " + str(value)
+    
+	hash_value = encrypt(message)
+    
+    if hash_value != int(signature):
+        return "Unauthorized transaction\n", 401
+
     if 'uid' in student:
         return unprocessable_entity("modifying the uid field is forbidden")
     for key, value in student.iteritems():
@@ -131,6 +188,18 @@ def update_student(uid):
 # DELETE .../students/<uid> - Delete a student
 @app.route('/K12/<uid>', methods=['DELETE'])
 def delete_student(uid):
+    signature = request.headers.get('signature')
+    if not signature:
+        return "Unauthorized transaction\n", 401
+	
+    req = "DELETE /K12/" + str(uid)
+    message = req
+
+    hash_value = encrypt(message)
+    
+    if hash_value != int(signature):
+        return "Unauthorized transaction\n", 401
+
     uid = defense(uid)
     if (uid == ''):
         return bad_request("improper UID format")
