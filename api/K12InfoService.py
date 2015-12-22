@@ -11,6 +11,8 @@ from flask import Response
 from flask import jsonify
 from SecurityService import encrypt
 
+SECURITY_TOGGLE_ON = False
+
 # Read AWS account keys from file
 keys = [line.rstrip('\n\r') for line in open('keys.txt')]
 session = Session(aws_access_key_id=keys[0],
@@ -80,7 +82,7 @@ def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
 
-    if not valid_signature(student):
+    if SECURITY_TOGGLE_ON and not valid_signature(student):
         return unauthorized()
 
     if 'uid' not in student:
@@ -98,13 +100,12 @@ def post_student():
 # GET .../students/<uid> - Get a student by uid
 @app.route('/K12/<uid>', methods = ['GET'])
 def get_student(uid):
-    if not valid_signature():
+    if SECURITY_TOGGLE_ON and not valid_signature():
         return unauthorized()
-
     uid = sanitize(uid)
     if (uid == ''):
         return bad_request("improper UID format")
-	student = find_item(uid)
+    student = find_item(uid)
     if student:
         return dumps(student), 200
     else:
@@ -113,7 +114,7 @@ def get_student(uid):
 # GET .../students - Get all students
 @app.route('/K12', methods = ['GET'])
 def get_all_students():
-    if not valid_signature():
+    if SECURITY_TOGGLE_ON and not valid_signature():
         return unauthorized()
 
     students = find_all_items()
@@ -128,7 +129,7 @@ def update_student(uid):
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
 
-    if not valid_signature(student):
+    if SECURITY_TOGGLE_ON and not valid_signature(student):
         return unauthorized()
 
     if 'uid' in student:
@@ -146,7 +147,7 @@ def update_student(uid):
 # DELETE .../students/<uid> - Delete a student
 @app.route('/K12/<uid>', methods=['DELETE'])
 def delete_student(uid):
-    if not valid_signature():
+    if SECURITY_TOGGLE_ON and not valid_signature():
         return unauthorized()
 
     uid = sanitize(uid)
@@ -253,10 +254,12 @@ def form_or_json():
 # Code injection defense
 def sanitize(value):
     try:
-        regex = re.compile('[^0-9a-zA-Z]')
-        value = regex.sub('', str(value))
+        if value.isalnum():
+            return value
+        else:
+            return ''
     except:
-	    return ''
+        return ''
     # Convert empty values to a space
     if len(value) < 1:
         return ' '
@@ -279,6 +282,5 @@ def valid_signature(student=None):
 
 if __name__ == '__main__':
     app.run(
-        debug = True,
         port = 9002
     )
