@@ -77,7 +77,7 @@ def batch_update(students):
 #==============================================================================
 
 # POST .../students - Create a new student
-@app.route('/K12', methods = ['POST'])
+@app.route('/k12', methods = ['POST'])
 def post_student():
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
@@ -98,7 +98,7 @@ def post_student():
     return "OK: new student(" + uid + ") created\n", 201
 
 # GET .../students/<uid> - Get a student by uid
-@app.route('/K12/<uid>', methods = ['GET'])
+@app.route('/k12/<uid>', methods = ['GET'])
 def get_student(uid):
     if SECURITY_TOGGLE_ON and not valid_signature():
         return unauthorized()
@@ -112,7 +112,7 @@ def get_student(uid):
         return not_found()
 
 # GET .../students - Get all students
-@app.route('/K12', methods = ['GET'])
+@app.route('/k12', methods = ['GET'])
 def get_all_students():
     if SECURITY_TOGGLE_ON and not valid_signature():
         return unauthorized()
@@ -124,7 +124,7 @@ def get_all_students():
         return not_found()
 
 # PUT .../students/<uid> - Update student field
-@app.route('/K12/<uid>', methods=['PUT'])
+@app.route('/k12/<uid>', methods=['PUT'])
 def update_student(uid):
     data = form_or_json()
     student = {key: value for (key, value) in data.iteritems()}
@@ -145,7 +145,7 @@ def update_student(uid):
         return not_found()
 
 # DELETE .../students/<uid> - Delete a student
-@app.route('/K12/<uid>', methods=['DELETE'])
+@app.route('/k12/<uid>', methods=['DELETE'])
 def delete_student(uid):
     if SECURITY_TOGGLE_ON and not valid_signature():
         return unauthorized()
@@ -164,8 +164,8 @@ def delete_student(uid):
 # Schema Changes
 #==============================================================================
 
-# PUT .../K12/schema/table - Add a column to the table schema with default values
-@app.route('/K12/schema/table', methods = ['PUT'])
+# PUT .../k12/schema/table - Add a column to the table schema with default values
+@app.route('/k12/schema/table', methods = ['PUT'])
 def update_schema():
     data = form_or_json()
     students = find_all_items()
@@ -179,8 +179,8 @@ def update_schema():
     batch_update(students)
     return "OK: schema successfully updated\n", 200
 
-# DELETE .../K12/schema/table/<key> - Delete a column from the table schema
-@app.route('/K12/schema/table/<key>', methods = ['DELETE'])
+# DELETE .../k12/schema/table/<key> - Delete a column from the table schema
+@app.route('/k12/schema/table/<key>', methods = ['DELETE'])
 def delete_schema(key):
     key = sanitize(key)
     if key == '':
@@ -270,7 +270,7 @@ def valid_signature(student=None):
     signature = request.headers.get('signature')
     if not signature:
         return False
-    # Get the type of request and URI ex. GET /K12/nb2406
+    # Get the type of request and URI ex. GET /k12/nb2406
     message = request.method + ' ' + request.script_root + request.path
     if student:
         for (key, value) in student.iteritems():
