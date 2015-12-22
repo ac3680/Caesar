@@ -1,11 +1,11 @@
 '''
-@app.route('/K12', methods = ['POST'])
-@app.route('/K12/<uid>', methods = ['GET'])
-@app.route('/K12', methods = ['GET'])
-@app.route('/K12/<uid>', methods=['PUT'])
-@app.route('/K12/<uid>', methods=['DELETE'])
-@app.route('/K12/schema/table', methods = ['PUT'])
-@app.route('/K12/schema/table/<key>', methods = ['DELETE'])
+@app.route('/k12', methods = ['POST'])
+@app.route('/k12/<uid>', methods = ['GET'])
+@app.route('/k12', methods = ['GET'])
+@app.route('/k12/<uid>', methods=['PUT'])
+@app.route('/k12/<uid>', methods=['DELETE'])
+@app.route('/k12/schema/table', methods = ['PUT'])
+@app.route('/k12/schema/table/<key>', methods = ['DELETE'])
 '''
 import json
 import time
@@ -20,7 +20,7 @@ while True:
                                 "req": [
                                     {
                                         "op": "POST",
-                                        "target": "/K12",
+                                        "target": "/k12",
                                         "respQ": "CliQ",
                                         "corrID": "861"
                                     }
@@ -60,7 +60,7 @@ while True:
     retval = q.write(m)
     print 'added message, got retval: %s' % retval
     
-    time.sleep(5)
+    time.sleep(1)
 
     #DO A GET --------------------------------------------------------------------------------
     jsonobj = json.dumps(
@@ -68,7 +68,7 @@ while True:
                                 "req": [
                                     {
                                         "op": "GET",
-                                        "target": "/K12/newuser1",
+                                        "target": "/k12/newuser1",
                                         "respQ": "CliQ",
                                         "corrID": "864"
                                     }
@@ -97,7 +97,7 @@ while True:
     retval = q.write(m)
     print 'added message, got retval: %s' % retval
     
-    time.sleep(5)
+    time.sleep(1)
 
     #DO A GET --------------------------------------------------------------------------------
     jsonobj = json.dumps(
@@ -105,9 +105,9 @@ while True:
                                 "req": [
                                     {
                                         "op": "GET",
-                                        "target": "/K12",
+                                        "target": "/k12",
                                         "respQ": "CliQ",
-                                        "corrID": "864"
+                                        "corrID": "8687"
                                     }
                                 ]
                             }
@@ -134,7 +134,7 @@ while True:
     retval = q.write(m)
     print 'added message, got retval: %s' % retval
     
-    time.sleep(5)
+    time.sleep(1)
     
     #DO A PUT --------------------------------------------------------------------------------
     jsonobj = json.dumps(
@@ -142,7 +142,7 @@ while True:
                                 "req": [
                                     {
                                         "op": "PUT",
-                                        "target": "/K12/newuser1",
+                                        "target": "/k12/newuser1",
                                         "respQ": "CliQ",
                                         "corrID": "862"
                                     }
@@ -178,7 +178,7 @@ while True:
     retval = q.write(m)
     print 'added message, got retval: %s' % retval
     
-    time.sleep(5)    
+    time.sleep(1)    
     
     
     #DO A DELETE --------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ while True:
                                 "req": [
                                     {
                                         "op": "DELETE",
-                                        "target": "/K12/newuser1",
+                                        "target": "/k12/newuser1",
                                         "respQ": "CliQ",
                                         "corrID": "863"
                                     }
@@ -216,7 +216,7 @@ while True:
     retval = q.write(m)
     print 'added message, got retval: %s' % retval
     
-    time.sleep(5)    
+    time.sleep(500)    
     
     
     #DO A PUT --------------------------------------------------------------------------------
@@ -225,9 +225,9 @@ while True:
                                 "req": [
                                     {
                                         "op": "PUT",
-                                        "target": "/K12/schema/table",
+                                        "target": "/k12/schema/table",
                                         "respQ": "CliQ",
-                                        "corrID": "862"
+                                        "corrID": "8652"
                                     }
                                 ],
                                 "body": [
@@ -259,7 +259,7 @@ while True:
     retval = q.write(m)
     print 'added message, got retval: %s' % retval
     
-    time.sleep(50)
+    time.sleep(500)
     
     
     #DO A DELETE --------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ while True:
                                 "req": [
                                     {
                                         "op": "DELETE",
-                                        "target": "/K12/schema/table/new_field",
+                                        "target": "/k12/schema/table/new_field",
                                         "respQ": "CliQ",
                                         "corrID": "869"
                                     }
