@@ -193,6 +193,7 @@ def delete_schema(key):
         try:
             del student[key]
         except KeyError:
+            return not_found()
             pass
     batch_update(students)
     return "No Content: schema key(" + key + ") successfully deleted\n", 204
